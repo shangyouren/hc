@@ -14,9 +14,9 @@
 #### B+树性能测试：<br>
 插入一亿条随机数据，每万次插入记录一个时间
 <br>（测试条件: key大概25-30个字节，完全随机，value大于100字节）
-![image](/docs/images/tree-write-test.png)
+![tree-write-test.png](/docs/images/tree-write-test.png)
 在之前插入的数据集内测试多线程（10个线程，一共读取一亿次，每万次读取记录时间）读取：
-![image](/docs/images/tree-read-test-multi.png)
+![tree-read-test-multi.png](/docs/images/tree-read-test-multi.png)
 在之前插入的数据集内测试单线程读取(100万次操作一共)：
 ![img.png](docs/images/img.png)
 
