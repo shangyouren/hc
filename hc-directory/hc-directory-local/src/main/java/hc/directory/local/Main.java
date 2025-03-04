@@ -2,14 +2,13 @@ package hc.directory.local;
 
 
 import cn.hutool.core.collection.ListUtil;
-import hc.directory.local.disk.capability.DirectoryService;
-import hc.directory.local.disk.capability.DirectoryServiceImplWithIndex;
-import hc.directory.local.disk.constants.EnumFileType;
-import hc.directory.local.disk.mapping.MappedByteBufferMappingFactory;
-import hc.directory.local.disk.mapping.RandomAccessFileMappingFactory;
-import hc.directory.local.disk.pojo.FileBlock;
-import hc.directory.local.disk.pojo.Paged;
-import hc.directory.local.disk.pojo.Path;
+import hc.directory.local.capability.DirectoryService;
+import hc.directory.local.capability.DirectoryServiceImplWithIndex;
+import hc.directory.local.constants.EnumFileType;
+import hc.directory.local.mapping.MappedByteBufferMappingFactory;
+import hc.directory.local.pojo.FileBlock;
+import hc.directory.local.pojo.Paged;
+import hc.directory.local.pojo.Path;
 import hc.utils.convert.ProjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,8 +32,8 @@ public class Main
                 40000, 20000,
                 new MappedByteBufferMappingFactory(),
                 false);
-//        testTerminal(directoryService);
-        testWrite(directoryService);
+        testTerminal(directoryService);
+//        testWrite(directoryService);
     }
 
     private static void testTerminal(DirectoryService directoryService){
@@ -54,7 +53,9 @@ public class Main
                 }
                 System.out.println("PWD:" + path);
             }else if (split[0].equals("ls")){
+                long time = System.currentTimeMillis();
                 Paged<FileBlock> list = directoryService.list(path, null);
+                System.out.println("【lost：" + (System.currentTimeMillis() - time) + "】");
                 int c= 0;
                 for (FileBlock datum : list.getData()) {
                     System.out.print(datum.getName() + "    ");

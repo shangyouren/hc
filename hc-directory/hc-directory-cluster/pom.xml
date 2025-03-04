@@ -10,9 +10,9 @@
         <version>0.1-A</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>hc-directory-local</artifactId>
+    <artifactId>hc-directory-cluster</artifactId>
     <packaging>jar</packaging>
-    <name>hc-directory-local</name>
+    <name>hc-directory-cluster</name>
 
     <dependencies>
 

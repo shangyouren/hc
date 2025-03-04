@@ -1,10 +1,10 @@
 package test.hc.directory.local.mapping;
 
-import hc.directory.local.disk.collect.btree.TreeLeaf;
-import hc.directory.local.disk.collect.btree.TreeLineDeserialize;
-import hc.directory.local.disk.collect.queue.DiskQueueLog;
-import hc.directory.local.disk.mapping.Serialize;
-import hc.directory.local.disk.pojo.FileBlockLeafDeserialize;
+import hc.directory.local.collect.btree.TreeLeaf;
+import hc.directory.local.collect.btree.TreeLineDeserialize;
+import hc.directory.local.collect.queue.DiskQueueLog;
+import hc.directory.local.mapping.Serialize;
+import hc.directory.local.pojo.FileBlockLeafDeserialize;
 import hc.utils.errors.CodeException;
 import org.junit.Test;
 import test.hc.directory.local.btree.SerializeTest;

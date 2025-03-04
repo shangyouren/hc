@@ -16,6 +16,7 @@
 
     <modules>
         <module>hc-directory-local</module>
+        <module>hc-directory-cluster</module>
     </modules>
 
     <dependencies>

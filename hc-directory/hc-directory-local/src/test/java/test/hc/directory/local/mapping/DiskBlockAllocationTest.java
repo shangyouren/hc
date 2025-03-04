@@ -1,8 +1,9 @@
 package test.hc.directory.local.mapping;
 
-import hc.directory.local.disk.collect.btree.TreeLineDeserialize;
+import hc.directory.local.collect.btree.TreeLineDeserialize;
 import hc.directory.local.disk.mapping.*;
-import hc.directory.local.disk.pojo.FileBlockLeafDeserialize;
+import hc.directory.local.mapping.*;
+import hc.directory.local.pojo.FileBlockLeafDeserialize;
 import org.junit.Assert;
 import org.junit.Test;
 

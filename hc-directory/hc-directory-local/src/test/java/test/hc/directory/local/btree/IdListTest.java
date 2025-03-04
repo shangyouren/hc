@@ -1,6 +1,6 @@
 package test.hc.directory.local.btree;
 
-import hc.directory.local.disk.collect.btree.LongList;
+import hc.directory.local.collect.btree.LongList;
 import org.junit.Assert;
 import org.junit.Test;
 

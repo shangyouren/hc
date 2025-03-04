@@ -1,6 +1,6 @@
 package test.hc.directory.local.mapping;
 
-import hc.directory.local.disk.collect.queue.DiskLongQueue;
+import hc.directory.local.collect.queue.DiskLongQueue;
 import org.junit.Assert;
 import org.junit.Test;
 

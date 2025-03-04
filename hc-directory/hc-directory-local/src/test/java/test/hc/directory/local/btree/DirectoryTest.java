@@ -1,20 +1,20 @@
 package test.hc.directory.local.btree;
 
 import cn.hutool.core.collection.ListUtil;
-import hc.directory.local.disk.capability.DirectoryService;
-import hc.directory.local.disk.capability.DirectoryServiceImpl;
-import hc.directory.local.disk.capability.DirectoryServiceImplWithIndex;
-import hc.directory.local.disk.constants.EnumFileType;
-import hc.directory.local.disk.mapping.MappedByteBufferMappingFactory;
-import hc.directory.local.disk.mapping.RandomAccessFileMappingFactory;
-import hc.directory.local.disk.pojo.FileBlock;
-import hc.directory.local.disk.pojo.Paged;
-import hc.directory.local.disk.pojo.Path;
+import hc.directory.local.capability.DirectoryService;
+import hc.directory.local.capability.DirectoryServiceImplWithIndex;
+import hc.directory.local.constants.EnumFileType;
+import hc.directory.local.mapping.MappedByteBufferMappingFactory;
+import hc.directory.local.pojo.FileBlock;
+import hc.directory.local.pojo.Paged;
+import hc.directory.local.pojo.Path;
 import hc.utils.convert.ProjectUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import test.hc.directory.local.mapping.DiskBlockAllocationTest;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,8 +22,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DirectoryTest {
 
     @Test
-    public void test() throws InterruptedException {
-        File baseDir = ProjectUtils.directoryPathWithCheck("temp-dir");
+    public void test() throws InterruptedException, IOException {
+        File baseDir = DiskBlockAllocationTest.createTempDirectory();
+//        File baseDir = ProjectUtils.directoryPathWithCheck("temp-dir");
         DirectoryService directoryService = new DirectoryServiceImplWithIndex(
                 baseDir, 8 * 1024, 8 * 1024, 40000, 20000,
                 new MappedByteBufferMappingFactory(), false);
