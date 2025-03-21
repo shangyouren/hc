@@ -208,7 +208,6 @@ public class BPlusTree {
         readLock.lock();
         try
         {
-            
             long rootBlockId = this.rootBlockId;
             if (rootBlockId == -1){
                 return null;
@@ -640,9 +639,6 @@ public class BPlusTree {
         old.clearAndSet(oldList);
         newBlock.clearAndSet(newList);
         TreeLine newLine = new TreeLine();
-        if (newList.size() <= 0){
-            System.out.println();
-        }
         newLine.setName(((Node) newList.get(0)).getName());
         newLine.setType(EnumFileType.NON_LEAF.getType());
         newLine.setPoint(newBlock.id());
@@ -744,7 +740,7 @@ public class BPlusTree {
         return null;
     }
 
-    public static void sort(String[] names, Object[] values){
+    private static void sort(String[] names, Object[] values){
         var len = names.length;
         for (var i = 0; i < len - 1; i++) {
             for (var j = 0; j < len - 1 - i; j++) {
