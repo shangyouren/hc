@@ -14,8 +14,11 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -108,6 +111,23 @@ public class NettyRpcClient implements RpcClient
             });
         });
         return channelMono.then(responseMono);
+    }
+
+    @Override
+    public Flux<RpcPackage> request(Object data, List<Target> targets)
+    {
+        return request(data, targets, config.getDefaultTaskTimeout());
+    }
+
+    @Override
+    public Flux<RpcPackage> request(Object data, List<Target> targets, long timeout)
+    {
+        List<Mono<RpcPackage>> list = new LinkedList<>();
+        for (Target target : targets)
+        {
+            list.add(request(data, target, timeout));
+        }
+        return Flux.merge(list);
     }
 
     public static void remove(Channel channel){

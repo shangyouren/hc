@@ -8,8 +8,10 @@ import hc.rpc.service.RpcClient;
 import hc.rpc.service.RpcServer;
 import lombok.Data;
 import org.junit.Test;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.function.Function;
 
 public class TestRpc
@@ -30,7 +32,10 @@ public class TestRpc
         bootstrap2.startServer(() -> new Test2RpcServer(rpcClient));
 
         long time = System.currentTimeMillis();
-        Mono<RpcPackage> response = rpcClient.request("hello shangyouren", new Target("localhost", 9006));
+        ArrayList<Target> targets = new ArrayList<>();
+        targets.add(new Target("localhost", 9006));
+        targets.add(new Target("localhost", 9005));
+        Flux<RpcPackage> response = rpcClient.request("hello shangyouren", targets);
         response.subscribe(rpcPackage -> System.out.println("response: [" + rpcPackage.getValue() + "]" + (System.currentTimeMillis() - time)));
         Thread.sleep(300);
     }
