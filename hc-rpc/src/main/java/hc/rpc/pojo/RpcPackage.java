@@ -41,9 +41,17 @@ public class RpcPackage
         RpcPackage response = new RpcPackage();
         response.setId(request.getId());
         response.setRequest(EnumPackageType.RESPONSE.getType());
-        response.setCode(EnumPackageCode.SUCCESS.getCode());
+        response.setCode(EnumPackageCode.ERROR.getCode());
         response.setException(e);
         return response;
     }
 
+    public static RpcPackage exceptionResponse(long requestId, Exception e){
+        RpcPackage response = new RpcPackage();
+        response.setId(requestId);
+        response.setRequest(EnumPackageType.RESPONSE.getType());
+        response.setCode(EnumPackageCode.ERROR.getCode());
+        response.setException(e);
+        return response;
+    }
 }

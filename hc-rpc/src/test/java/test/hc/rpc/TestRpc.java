@@ -1,17 +1,16 @@
 package test.hc.rpc;
 
 import hc.rpc.Bootstrap;
+import hc.rpc.RpcConfig;
 import hc.rpc.pojo.RpcPackage;
 import hc.rpc.pojo.Target;
 import hc.rpc.service.RpcClient;
 import hc.rpc.service.RpcServer;
-import hc.rpc.service.RpcServerFactory;
-import hc.rpc.service.impl.NettyRpcClient;
+import lombok.Data;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class TestRpc
 {
@@ -19,23 +18,43 @@ public class TestRpc
     @Test
     public void test() throws InterruptedException
     {
-        Bootstrap bootstrap = new Bootstrap();
+        Bootstrap bootstrap = new Bootstrap(new RpcConfig());
         bootstrap.startServer(TestRpcServer::new);
+
         RpcClient rpcClient = bootstrap.startClient();
+
+
+        RpcConfig config2 = new RpcConfig();
+        config2.setPort(9006);
+        Bootstrap bootstrap2 = new Bootstrap(config2);
+        bootstrap2.startServer(() -> new Test2RpcServer(rpcClient));
+
         long time = System.currentTimeMillis();
-        for (int i = 0; i < 10; i++)
+        Mono<RpcPackage> response = rpcClient.request("hello shangyouren", new Target("localhost", 9006));
+        response.subscribe(rpcPackage -> System.out.println("response: [" + rpcPackage.getValue() + "]" + (System.currentTimeMillis() - time)));
+        Thread.sleep(300);
+    }
+
+    @Data
+    public static class Test2RpcServer implements RpcServer{
+
+        private final RpcClient client;
+
+        @Override
+        public Mono<RpcPackage> accept(RpcPackage rpcPackage)
         {
-            Mono<RpcPackage> response = rpcClient.request("hello shangyouren", new Target("localhost", 9005));
-            int finalI = i;
-            response.subscribe(rpcPackage -> {
-                System.out.println("response: [" + rpcPackage.getValue() + "]");
-                if (finalI % 10000 == 0){
-                    System.out.println(System.currentTimeMillis() - time);
-                }
+            System.out.println("accept2: [" + rpcPackage.getValue() + "]");
+            Mono<RpcPackage> response = client.request("hello shangyouren2", new Target("localhost", 9005));
+
+            return response.flatMap((Function<RpcPackage, Mono<RpcPackage>>) rpcPackage1 ->
+            {
+                System.out.println("response2: [" + rpcPackage1.getValue() + "]");
+                RpcPackage response2 = RpcPackage.response(rpcPackage1);
+                response2.setValue("789");
+                return Mono.just(response2);
             });
+
         }
-        Thread.sleep(10000);
-        NettyRpcClient.printChannel();
     }
 
     public static class TestRpcServer implements RpcServer{

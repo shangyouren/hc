@@ -18,32 +18,39 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter
     public final RpcServer server;
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
+    public void channelRead(ChannelHandlerContext ctx, Object msg)
     {
         RpcPackage rpcPackage = (RpcPackage) msg;
-        Mono<RpcPackage> accept = server.accept(rpcPackage);
-        accept.doOnError(throwable ->
+        try
         {
-            if (!ctx.channel().isActive())
+            Mono<RpcPackage> accept = server.accept(rpcPackage);
+            accept.doOnError(throwable ->
             {
-                throw new ChannelUnsupprotException();
-            }
-            RpcPackage response = new RpcPackage();
-            response.setException(throwable);
-            response.setId(rpcPackage.getId());
-            response.setCode(EnumPackageCode.ERROR.getCode());
-            response.setRequest(EnumPackageType.RESPONSE.getType());
+                if (!ctx.channel().isActive())
+                {
+                    throw new ChannelUnsupprotException();
+                }
+                RpcPackage response = new RpcPackage();
+                response.setException(throwable);
+                response.setId(rpcPackage.getId());
+                response.setCode(EnumPackageCode.ERROR.getCode());
+                response.setRequest(EnumPackageType.RESPONSE.getType());
+                ctx.writeAndFlush(response);
+            });
+            accept.subscribe(response ->
+            {
+                if (!ctx.channel().isActive()){
+                    throw new ChannelUnsupprotException();
+                }
+                response.setId(rpcPackage.getId());
+                response.setRequest(EnumPackageType.RESPONSE.getType());
+                response.setRequest(EnumPackageType.RESPONSE.getType());
+                ctx.writeAndFlush(response);
+            });
+        }catch (Exception e){
+            RpcPackage response = RpcPackage.exceptionResponse(rpcPackage, e);
             ctx.writeAndFlush(response);
-        });
-        accept.subscribe(response ->
-        {
-            if (!ctx.channel().isActive()){
-                throw new ChannelUnsupprotException();
-            }
-            response.setId(rpcPackage.getId());
-            response.setRequest(EnumPackageType.RESPONSE.getType());
-            response.setRequest(EnumPackageType.RESPONSE.getType());
-            ctx.writeAndFlush(response);
-        });
+        }
+
     }
 }

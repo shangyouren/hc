@@ -1,6 +1,7 @@
 package hc.rpc.service.impl;
 
 import cn.hutool.core.lang.Snowflake;
+import hc.rpc.RpcConfig;
 import hc.rpc.errors.ChannelUnsupprotException;
 import hc.rpc.errors.TargetErrorException;
 import hc.rpc.pojo.EnumPackageCode;
@@ -13,19 +14,26 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@AllArgsConstructor
 public class NettyRpcClient implements RpcClient
 {
+
+    public NettyRpcClient(Bootstrap bootstrap, RpcConfig config){
+        this.bootstrap = bootstrap;
+        this.config = config;
+        snowflake = new Snowflake(config.getWorkId() / 32, config.getWorkId() % 32);
+    }
+
     private final Bootstrap bootstrap;
 
-    private final Snowflake snowflake = new Snowflake(1, 2);
+    private final RpcConfig config;
+
+    private final Snowflake snowflake;
 
     private final static ConcurrentHashMap<String, ChannelPool> CHANNEL_MAP = new ConcurrentHashMap<>();
 
@@ -33,6 +41,12 @@ public class NettyRpcClient implements RpcClient
 
     @Override
     public Mono<RpcPackage> request(Object data, Target target)
+    {
+        return request(data, target, config.getDefaultTaskTimeout());
+    }
+
+    @Override
+    public Mono<RpcPackage> request(Object data, Target target, long timeout)
     {
         ChannelPool cacheChannelPool = CHANNEL_MAP.get(target.toString());
         if (cacheChannelPool != null){
@@ -49,7 +63,7 @@ public class NettyRpcClient implements RpcClient
                 channelFuture.addListener((ChannelFutureListener) channelFuture1 ->
                 {
                     if (channelFuture1.isSuccess()){
-                        TaskManager.addTask(msg.getId(), responseFuture, -1);
+                        TaskManager.addTask(msg.getId(), responseFuture, timeout);
                     }else {
                         responseFuture.complete(RpcPackage.exceptionResponse(msg, new ChannelUnsupprotException()));
                     }
@@ -87,7 +101,7 @@ public class NettyRpcClient implements RpcClient
             channelFuture.addListener((ChannelFutureListener) channelFuture1 ->
             {
                 if (channelFuture1.isSuccess()){
-                    TaskManager.addTask(msg.getId(), responseFuture, -1);
+                    TaskManager.addTask(msg.getId(), responseFuture, timeout);
                 }else {
                     responseFuture.complete(RpcPackage.exceptionResponse(msg, new ChannelUnsupprotException()));
                 }

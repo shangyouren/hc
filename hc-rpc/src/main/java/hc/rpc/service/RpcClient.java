@@ -9,4 +9,6 @@ public interface RpcClient
 
     Mono<RpcPackage> request(Object data, Target target);
 
+    Mono<RpcPackage> request(Object data, Target target, long timeout);
+
 }

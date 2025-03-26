@@ -17,20 +17,29 @@ import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.AllArgsConstructor;
 
 import java.net.InetSocketAddress;
 
 public class Bootstrap {
 
-    private final EventLoopGroup bossGroup =
-            Epoll.isAvailable() ?
-                    new EpollEventLoopGroup(1) :
-                    new NioEventLoopGroup(1);
+    public Bootstrap(RpcConfig config){
+        this.config = config;
+        bossGroup =
+                Epoll.isAvailable() ?
+                        new EpollEventLoopGroup(config.getBossGroupThreads()) :
+                        new NioEventLoopGroup(config.getBossGroupThreads());
+        workGroup =
+                Epoll.isAvailable() ?
+                        new EpollEventLoopGroup(config.getWorkGroupThreads()) :
+                        new NioEventLoopGroup(config.getWorkGroupThreads());
+    }
 
-    private final EventLoopGroup workGroup =
-            Epoll.isAvailable() ?
-                    new EpollEventLoopGroup(4) :
-                    new NioEventLoopGroup(4);
+    private final RpcConfig config;
+
+    private final EventLoopGroup bossGroup;
+
+    private final EventLoopGroup workGroup;
 
 
     public void startServer(RpcServerFactory factory)
@@ -42,11 +51,11 @@ public class Bootstrap {
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.SO_KEEPALIVE, false)
                 .childOption(ChannelOption.TCP_NODELAY, true)
-                .childOption(ChannelOption.SO_SNDBUF, 8 * 1024)
-                .childOption(ChannelOption.SO_RCVBUF, 8 * 1024)
-                .localAddress(new InetSocketAddress(9005))
+                .childOption(ChannelOption.SO_SNDBUF, config.getSendBufSize())
+                .childOption(ChannelOption.SO_RCVBUF, config.getReceiverBufSize())
+                .localAddress(new InetSocketAddress(config.getPort()))
                 .childHandler(Epoll.isAvailable() ? new EpollServerChannelInitializer(factory) : new NioServerChannelInitializer(factory));
-        serverBootstrap.bind(9005);
+        serverBootstrap.bind(config.getPort());
     }
 
     public RpcClient startClient(){
@@ -54,7 +63,7 @@ public class Bootstrap {
         bootstrap.group(workGroup)
                 .channel(Epoll.isAvailable() ? EpollServerSocketChannel.class : NioSocketChannel.class)
                 .handler(Epoll.isAvailable() ? new EpollClientChannelInitializer() : new NioClientChannelInitializer());
-        return new NettyRpcClient(bootstrap);
+        return new NettyRpcClient(bootstrap, config);
     }
 
 }
