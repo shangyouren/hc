@@ -3,6 +3,8 @@ package hc.rpc.pojo;
 import hc.utils.convert.DataTransformUtil;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class RpcPackage
 {
@@ -20,12 +22,16 @@ public class RpcPackage
     protected Object value;
 
     public void setValue(Object v){
+        if (v instanceof List<?>){
+            this.className = List.class.getCanonicalName();
+        }else {
+            this.className = v.getClass().getCanonicalName();
+        }
         this.value = v;
-        this.className = v.getClass().getCanonicalName();
     }
 
     public void setException(Throwable e){
-        this.className = Exception.class.getCanonicalName();
+        this.className = Throwable.class.getCanonicalName();
         this.value = e;
     }
 

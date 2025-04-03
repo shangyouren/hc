@@ -12,6 +12,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.UUID;
 import java.util.function.Function;
 
 public class TestRpc
@@ -35,10 +37,15 @@ public class TestRpc
         ArrayList<Target> targets = new ArrayList<>();
         targets.add(new Target("localhost", 9006));
         targets.add(new Target("localhost", 9005));
-        Flux<RpcPackage> response = rpcClient.request("hello shangyouren", targets);
+        ArrayList<Object> data = new ArrayList<>();
+        data.add("hello shangyouren");
+        data.add(new TestObj());
+        Flux<RpcPackage> response = rpcClient.request(data, targets);
         response.subscribe(rpcPackage -> System.out.println("response: [" + rpcPackage.getValue() + "]" + (System.currentTimeMillis() - time)));
         Thread.sleep(300);
     }
+
+
 
     @Data
     public static class Test2RpcServer implements RpcServer{

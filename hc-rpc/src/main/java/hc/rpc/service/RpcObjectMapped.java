@@ -1,6 +1,9 @@
 package hc.rpc.service;
 
+import hc.rpc.service.impl.ListRpcObjectMapped;
 import io.netty.buffer.ByteBuf;
+
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class RpcObjectMapped<T>
@@ -13,7 +16,6 @@ public abstract class RpcObjectMapped<T>
 
     public RpcObjectMapped(Class<T> clazz){
         this.clazz = clazz;
-        register(this);
     }
 
     private final Class<T> clazz;
@@ -26,6 +28,9 @@ public abstract class RpcObjectMapped<T>
     }
 
     public static RpcObjectMapped<?> find(String className){
+        if (className.equals(List.class.getCanonicalName())){
+            return new ListRpcObjectMapped();
+        }
         return REGISTER.get(className);
     }
 }

@@ -6,7 +6,9 @@ import hc.rpc.netty.client.NioClientChannelInitializer;
 import hc.rpc.netty.server.EpollServerChannelInitializer;
 import hc.rpc.netty.server.NioServerChannelInitializer;
 import hc.rpc.service.RpcClient;
+import hc.rpc.service.RpcObjectMapped;
 import hc.rpc.service.RpcServerFactory;
+import hc.rpc.service.impl.ExceptionRpcObjectMapped;
 import hc.rpc.service.impl.NettyRpcClient;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
@@ -17,7 +19,6 @@ import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import lombok.AllArgsConstructor;
 
 import java.net.InetSocketAddress;
 
@@ -64,6 +65,11 @@ public class Bootstrap {
                 .channel(Epoll.isAvailable() ? EpollServerSocketChannel.class : NioSocketChannel.class)
                 .handler(Epoll.isAvailable() ? new EpollClientChannelInitializer() : new NioClientChannelInitializer());
         return new NettyRpcClient(bootstrap, config);
+    }
+
+
+    static {
+        RpcObjectMapped.register(new ExceptionRpcObjectMapped());
     }
 
 }

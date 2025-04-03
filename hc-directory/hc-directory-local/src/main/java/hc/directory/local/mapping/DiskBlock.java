@@ -191,7 +191,6 @@ public class DiskBlock<H extends SerializeHeader, S extends Serialize> {
     }
 
     public void close() {
-        sync();
         this.map.force();
     }
 

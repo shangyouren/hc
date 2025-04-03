@@ -59,6 +59,9 @@ public class NettyRpcClient implements RpcClient
                 msg.setId(snowflake.nextId());
                 msg.setRequest(EnumPackageType.REQUEST.getType());
                 msg.setCode(EnumPackageCode.SUCCESS.getCode());
+                if (data instanceof List){
+
+                }
                 msg.setValue(data);
                 ChannelFuture channelFuture = one.writeAndFlush(msg);
                 CompletableFuture<RpcPackage> responseFuture = new CompletableFuture<>();

@@ -9,6 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class NetworkPackageEncoder<T> extends MessageToByteEncoder<RpcPackage>
 {
